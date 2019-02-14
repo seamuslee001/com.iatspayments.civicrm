@@ -1495,8 +1495,9 @@ function _iats_get_future_monthly_start_dates($start_date, $allow_days) {
   $start_dates = array();
   // special handling for today - it means immediately or now.
   $today = date('Ymd').'030000';
+  $allow_any_day = (max($allow_days) <= 0) ? TRUE : FALSE;
   // If not set, only allow for the first 28 days of the month.
-  if (max($allow_days) <= 0) {
+  if ($allow_any_day) {
     $allow_days = range(1,28);
   }
   for ($j = 0; $j < count($allow_days); $j++) {
@@ -1517,6 +1518,11 @@ function _iats_get_future_monthly_start_dates($start_date, $allow_days) {
     }
     $start_dates[$key] = $display;
     $start_date += (24 * 60 * 60);
+  }
+  // A weird special case: if today is > 28 and I haven't explicitly set allowable days
+  if ($allow_any_day && !isset($start_dates[''])) {
+    $start_dates[''] = ts('Now');
+    ksort($start_dates);
   }
   return $start_dates;
 }

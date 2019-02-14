@@ -194,7 +194,7 @@ class CRM_Core_Payment_iATSService extends CRM_Core_Payment {
           (customer_code, ip, expiry, cid, email, recur_id) VALUES (%1, %2, %3, %4, %5, %6)", $query_params);
         // Test for admin setting that limits allowable transaction days
         $allow_days = $this->getSettings('days');
-        // Also test for a specific recieve date request that is not today.
+        // Also test for a specific receive date request that is not today.
         $receive_date_request = CRM_Utils_Array::value('receive_date', $params);
         // If the receive_date is set to sometime today, unset it.
         if (!empty($receive_date_request)) {
@@ -462,6 +462,13 @@ class CRM_Core_Payment_iATSService extends CRM_Core_Payment {
       // By default, it's empty, unless we've got a future start date.
       if (empty($update['receive_date'])) {
         $next = strtotime('+' . $params['frequency_interval'] . ' ' . $params['frequency_unit']);
+        // handle the special case of monthly contributions made after the 28th
+        if ('month' == $params['frequency_unit']) {
+          $now = getdate();
+          if ($now['mday'] > 28) { // pull it back to the 28th
+            $next = $next - (($now['mday'] - 28) * 24 * 60 * 60);
+          }
+        }
         $recur_update['next_sched_contribution_date'] = date('Ymd', $next) . '030000';
       }
       else {

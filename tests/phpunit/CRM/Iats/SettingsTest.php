@@ -52,7 +52,7 @@ class CRM_Iats_SettingsTest extends \PHPUnit\Framework\TestCase implements Headl
   public function testGetDates():void {
     Civi::settings()->set('iats_days', '1');
     $this->assertIsArray(CRM_Iats_Utils::getSettings()['days']);
-    Civi::settings()->set('iats_days', ['1', '2', '3', '5', '7']);
+    Civi::settings()->set('iats_days', CRM_Utils_Array::implodePadded(['1', '2', '3', '5', '7']));
     $this->assertIsArray(CRM_Iats_Utils::getSettings()['days']);
     $this->assertEquals(['1', '2', '3', '5', '7'], CRM_Iats_Utils::getSettings()['days']);
   }
